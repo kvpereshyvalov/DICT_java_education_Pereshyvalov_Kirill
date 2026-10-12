@@ -40,6 +40,26 @@ public class ChatBot {
             System.out.println(currentNumber + "!");
         }
 
+        String userAnswer;
+
+        do {
+            System.out.println("Which option correctly declares an integer variable in Java?");
+            System.out.println("1. int number = 5;");
+            System.out.println("2. number int = 5;");
+            System.out.println("3. int = number 5;");
+            System.out.println("4. integer number = 5;");
+
+            userAnswer = scanner.next();
+
+            if (!userAnswer.equals("1")) {
+                System.out.println("That answer is incorrect. Please, try again.");
+            }
+
+        } while (!userAnswer.equals("1"));
+
+        System.out.println("Correct!");
+        System.out.println("Goodbye, have a nice day!");
+
         scanner.close();
     }
 }
