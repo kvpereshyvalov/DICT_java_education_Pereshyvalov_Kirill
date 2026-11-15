@@ -21,8 +21,11 @@ public class Hangman {
         int selectedWordIndex = randomGenerator.nextInt(availableWords.length);
         String secretWord = availableWords[selectedWordIndex];
 
+        String wordHint = secretWord.substring(0, 2)
+                + "-".repeat(secretWord.length() - 2);
+
         System.out.println("HANGMAN");
-        System.out.print("Guess the word: > ");
+        System.out.print("Guess the word " + wordHint + ": > ");
 
         String playerGuess = scanner.nextLine();
 
