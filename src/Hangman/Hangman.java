@@ -36,21 +36,42 @@ public class Hangman {
             String playerInput = scanner.nextLine();
             char guessedLetter = playerInput.charAt(0);
 
+            boolean letterWasRevealed = false;
+
             for (int letterIndex = 0; letterIndex < secretWord.length(); letterIndex++) {
 
-                if (secretWord.charAt(letterIndex) == guessedLetter) {
+                if (secretWord.charAt(letterIndex) == guessedLetter
+                        && revealedWord.charAt(letterIndex) == '-') {
+
                     revealedWord.setCharAt(letterIndex, guessedLetter);
+                    letterWasRevealed = true;
                 }
             }
 
-            remainingAttempts--;
-        }
+            if (!letterWasRevealed) {
 
-        System.out.println();
-        System.out.println(revealedWord);
-        System.out.println();
-        System.out.println("Thanks for playing!");
-        System.out.println("We'll see how well you did in the next stage");
+                if (secretWord.indexOf(guessedLetter) >= 0) {
+                    System.out.println("No improvements");
+                } else {
+                    System.out.println("That letter doesn't appear in the word");
+                }
+
+                remainingAttempts--;
+            }
+
+            System.out.println();
+            System.out.println(revealedWord);
+
+            if (revealedWord.toString().equals(secretWord)) {
+                System.out.println("You guessed the word!");
+                System.out.println("You survived!");
+                break;
+            }
+
+            if (remainingAttempts == 0) {
+                System.out.println("You lost!");
+            }
+        }
 
         scanner.close();
     }
