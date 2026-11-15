@@ -21,19 +21,36 @@ public class Hangman {
         int selectedWordIndex = randomGenerator.nextInt(availableWords.length);
         String secretWord = availableWords[selectedWordIndex];
 
-        String wordHint = secretWord.substring(0, 2)
-                + "-".repeat(secretWord.length() - 2);
+        StringBuilder revealedWord = new StringBuilder("-".repeat(secretWord.length()));
+
+        int remainingAttempts = 8;
 
         System.out.println("HANGMAN");
-        System.out.print("Guess the word " + wordHint + ": > ");
 
-        String playerGuess = scanner.nextLine();
+        while (remainingAttempts > 0) {
 
-        if (playerGuess.equals(secretWord)) {
-            System.out.println("You survived!");
-        } else {
-            System.out.println("You lost!");
+            System.out.println();
+            System.out.println(revealedWord);
+            System.out.print("Input a letter: > ");
+
+            String playerInput = scanner.nextLine();
+            char guessedLetter = playerInput.charAt(0);
+
+            for (int letterIndex = 0; letterIndex < secretWord.length(); letterIndex++) {
+
+                if (secretWord.charAt(letterIndex) == guessedLetter) {
+                    revealedWord.setCharAt(letterIndex, guessedLetter);
+                }
+            }
+
+            remainingAttempts--;
         }
+
+        System.out.println();
+        System.out.println(revealedWord);
+        System.out.println();
+        System.out.println("Thanks for playing!");
+        System.out.println("We'll see how well you did in the next stage");
 
         scanner.close();
     }
