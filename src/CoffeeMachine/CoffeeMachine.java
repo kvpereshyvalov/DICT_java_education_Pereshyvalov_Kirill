@@ -12,27 +12,52 @@ public class CoffeeMachine {
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             CoffeeMachine coffeeMachine = new CoffeeMachine();
-            coffeeMachine.calculateRequiredIngredients(scanner);
+            coffeeMachine.checkIngredientAvailability(scanner);
         }
     }
 
-    private void calculateRequiredIngredients(Scanner scanner) {
+    private void checkIngredientAvailability(Scanner scanner) {
+        System.out.println("Write how many ml of water the coffee machine has:");
+        int availableWaterMilliliters = scanner.nextInt();
+
+        System.out.println("Write how many ml of milk the coffee machine has:");
+        int availableMilkMilliliters = scanner.nextInt();
+
+        System.out.println("Write how many grams of coffee beans the coffee machine has:");
+        int availableCoffeeBeansGrams = scanner.nextInt();
+
         System.out.println("Write how many cups of coffee you will need:");
+        int requestedCups = scanner.nextInt();
 
-        int numberOfCups = scanner.nextInt();
+        int maximumCupsByWater =
+                availableWaterMilliliters / WATER_PER_CUP_MILLILITERS;
 
-        int requiredWaterMilliliters =
-                numberOfCups * WATER_PER_CUP_MILLILITERS;
+        int maximumCupsByMilk =
+                availableMilkMilliliters / MILK_PER_CUP_MILLILITERS;
 
-        int requiredMilkMilliliters =
-                numberOfCups * MILK_PER_CUP_MILLILITERS;
+        int maximumCupsByCoffeeBeans =
+                availableCoffeeBeansGrams / COFFEE_BEANS_PER_CUP_GRAMS;
 
-        int requiredCoffeeBeansGrams =
-                numberOfCups * COFFEE_BEANS_PER_CUP_GRAMS;
+        int maximumPossibleCups = Math.min(
+                maximumCupsByWater,
+                Math.min(maximumCupsByMilk, maximumCupsByCoffeeBeans)
+        );
 
-        System.out.println("For " + numberOfCups + " cups of coffee you will need:");
-        System.out.println(requiredWaterMilliliters + " ml of water");
-        System.out.println(requiredMilkMilliliters + " ml of milk");
-        System.out.println(requiredCoffeeBeansGrams + " g of coffee beans");
+        if (maximumPossibleCups < requestedCups) {
+            System.out.println(
+                    "No, I can make only " + maximumPossibleCups + " cups of coffee"
+            );
+        } else if (maximumPossibleCups > requestedCups) {
+            int additionalCups = maximumPossibleCups - requestedCups;
+
+            System.out.println(
+                    "Yes, I can make that amount of coffee (and even "
+                            + additionalCups + " more than that)"
+            );
+        } else {
+            System.out.println("Yes, I can make that amount of coffee");
+        }
     }
 }
+
+
