@@ -24,6 +24,8 @@ public class TicTacToe {
     }
 
     public boolean loadBoard(String cellState) {
+        cellState = cellState.trim();
+
         if (cellState.length() != BOARD_SIZE * BOARD_SIZE) {
             return false;
         }
@@ -146,6 +148,67 @@ public class TicTacToe {
         return "Game not finished";
     }
 
+    private boolean isCoordinateWithinBoard(int rowCoordinate, int columnCoordinate) {
+        return rowCoordinate >= 1
+                && rowCoordinate <= BOARD_SIZE
+                && columnCoordinate >= 1
+                && columnCoordinate <= BOARD_SIZE;
+    }
+
+    private boolean makeMove(int rowCoordinate, int columnCoordinate) {
+        int rowIndex = rowCoordinate - 1;
+        int columnIndex = columnCoordinate - 1;
+
+        if (gameBoard[rowIndex][columnIndex] != EMPTY_CELL) {
+            return false;
+        }
+
+        gameBoard[rowIndex][columnIndex] = PLAYER_X;
+
+        return true;
+    }
+
+    public void requestPlayerMove(Scanner scanner) {
+        while (true) {
+            System.out.print("Enter the coordinates: ");
+
+            String coordinateInput = scanner.nextLine().trim();
+
+            String[] coordinateValues = coordinateInput.isEmpty()
+                    ? new String[0]
+                    : coordinateInput.split("\\s+");
+
+            if (coordinateValues.length != 2) {
+                System.out.println("You should enter numbers!");
+                continue;
+            }
+
+            int rowCoordinate;
+            int columnCoordinate;
+
+            try {
+                rowCoordinate = Integer.parseInt(coordinateValues[0]);
+                columnCoordinate = Integer.parseInt(coordinateValues[1]);
+
+            } catch (NumberFormatException exception) {
+                System.out.println("You should enter numbers!");
+                continue;
+            }
+
+            if (!isCoordinateWithinBoard(rowCoordinate, columnCoordinate)) {
+                System.out.println("Coordinates should be from 1 to 3!");
+                continue;
+            }
+
+            if (!makeMove(rowCoordinate, columnCoordinate)) {
+                System.out.println("This cell is occupied! Choose another one!");
+                continue;
+            }
+
+            break;
+        }
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -169,8 +232,11 @@ public class TicTacToe {
 
         game.displayBoard();
 
-        System.out.println(game.analyzeGameState());
+        game.requestPlayerMove(scanner);
+
+        game.displayBoard();
 
         scanner.close();
     }
 }
+
