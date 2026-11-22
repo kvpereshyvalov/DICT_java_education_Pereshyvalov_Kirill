@@ -23,34 +23,6 @@ public class TicTacToe {
         }
     }
 
-    public boolean loadBoard(String cellState) {
-        cellState = cellState.trim();
-
-        if (cellState.length() != BOARD_SIZE * BOARD_SIZE) {
-            return false;
-        }
-
-        for (int index = 0; index < cellState.length(); index++) {
-            char cellSymbol = cellState.charAt(index);
-
-            if (cellSymbol != PLAYER_X
-                    && cellSymbol != PLAYER_O
-                    && cellSymbol != EMPTY_CELL) {
-                return false;
-            }
-        }
-
-        for (int rowIndex = 0; rowIndex < BOARD_SIZE; rowIndex++) {
-            for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
-                int cellIndex = rowIndex * BOARD_SIZE + columnIndex;
-
-                gameBoard[rowIndex][columnIndex] = cellState.charAt(cellIndex);
-            }
-        }
-
-        return true;
-    }
-
     public void displayBoard() {
         System.out.println("---------");
 
@@ -58,27 +30,19 @@ public class TicTacToe {
             System.out.print("|");
 
             for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
-                System.out.print(gameBoard[rowIndex][columnIndex]);
+                char cellSymbol = gameBoard[rowIndex][columnIndex];
+
+                if (cellSymbol == EMPTY_CELL) {
+                    System.out.print(" ");
+                } else {
+                    System.out.print(cellSymbol);
+                }
             }
 
             System.out.println("|");
         }
 
         System.out.println("---------");
-    }
-
-    private int countSymbols(char playerSymbol) {
-        int symbolCount = 0;
-
-        for (int rowIndex = 0; rowIndex < BOARD_SIZE; rowIndex++) {
-            for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
-                if (gameBoard[rowIndex][columnIndex] == playerSymbol) {
-                    symbolCount++;
-                }
-            }
-        }
-
-        return symbolCount;
     }
 
     private boolean hasWinningLine(char playerSymbol) {
@@ -119,64 +83,34 @@ public class TicTacToe {
     }
 
     private boolean isBoardFull() {
-        return countSymbols(EMPTY_CELL) == 0;
+        for (int rowIndex = 0; rowIndex < BOARD_SIZE; rowIndex++) {
+            for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
+                if (gameBoard[rowIndex][columnIndex] == EMPTY_CELL) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
-    public String analyzeGameState() {
-        int xCount = countSymbols(PLAYER_X);
-        int oCount = countSymbols(PLAYER_O);
-
-        boolean xWins = hasWinningLine(PLAYER_X);
-        boolean oWins = hasWinningLine(PLAYER_O);
-
-        if (Math.abs(xCount - oCount) > 1 || (xWins && oWins)) {
-            return "Impossible";
-        }
-
-        if (xWins) {
-            return "X wins";
-        }
-
-        if (oWins) {
-            return "O wins";
-        }
-
-        if (isBoardFull()) {
-            return "Draw";
-        }
-
-        return "Game not finished";
-    }
-
-    private boolean isCoordinateWithinBoard(int rowCoordinate, int columnCoordinate) {
+    private boolean isCoordinateWithinBoard(
+            int rowCoordinate,
+            int columnCoordinate
+    ) {
         return rowCoordinate >= 1
                 && rowCoordinate <= BOARD_SIZE
                 && columnCoordinate >= 1
                 && columnCoordinate <= BOARD_SIZE;
     }
 
-    private boolean makeMove(int rowCoordinate, int columnCoordinate) {
-        int rowIndex = rowCoordinate - 1;
-        int columnIndex = columnCoordinate - 1;
-
-        if (gameBoard[rowIndex][columnIndex] != EMPTY_CELL) {
-            return false;
-        }
-
-        gameBoard[rowIndex][columnIndex] = PLAYER_X;
-
-        return true;
-    }
-
-    public void requestPlayerMove(Scanner scanner) {
+    private void requestPlayerMove(Scanner scanner, char playerSymbol) {
         while (true) {
             System.out.print("Enter the coordinates: ");
 
             String coordinateInput = scanner.nextLine().trim();
 
-            String[] coordinateValues = coordinateInput.isEmpty()
-                    ? new String[0]
-                    : coordinateInput.split("\\s+");
+            String[] coordinateValues = coordinateInput.split("\\s+");
 
             if (coordinateValues.length != 2) {
                 System.out.println("You should enter numbers!");
@@ -200,12 +134,47 @@ public class TicTacToe {
                 continue;
             }
 
-            if (!makeMove(rowCoordinate, columnCoordinate)) {
-                System.out.println("This cell is occupied! Choose another one!");
+            int rowIndex = rowCoordinate - 1;
+            int columnIndex = columnCoordinate - 1;
+
+            if (gameBoard[rowIndex][columnIndex] != EMPTY_CELL) {
+                System.out.println(
+                        "This cell is occupied! Choose another one!"
+                );
                 continue;
             }
 
+            gameBoard[rowIndex][columnIndex] = playerSymbol;
+
             break;
+        }
+    }
+
+    public void playGame(Scanner scanner) {
+        char currentPlayer = PLAYER_X;
+
+        displayBoard();
+
+        while (true) {
+            requestPlayerMove(scanner, currentPlayer);
+
+            displayBoard();
+
+            if (hasWinningLine(currentPlayer)) {
+                System.out.println(currentPlayer + " wins");
+                break;
+            }
+
+            if (isBoardFull()) {
+                System.out.println("Draw");
+                break;
+            }
+
+            if (currentPlayer == PLAYER_X) {
+                currentPlayer = PLAYER_O;
+            } else {
+                currentPlayer = PLAYER_X;
+            }
         }
     }
 
@@ -214,29 +183,8 @@ public class TicTacToe {
 
         TicTacToe game = new TicTacToe();
 
-        boolean boardLoaded = false;
-
-        while (!boardLoaded) {
-            System.out.print("Enter cells: ");
-
-            String cellState = scanner.nextLine();
-
-            boardLoaded = game.loadBoard(cellState);
-
-            if (!boardLoaded) {
-                System.out.println(
-                        "Invalid input. Enter exactly 9 characters using X, O, and _."
-                );
-            }
-        }
-
-        game.displayBoard();
-
-        game.requestPlayerMove(scanner);
-
-        game.displayBoard();
+        game.playGame(scanner);
 
         scanner.close();
     }
 }
-
