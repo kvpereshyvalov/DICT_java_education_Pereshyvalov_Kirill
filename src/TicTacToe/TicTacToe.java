@@ -7,6 +7,10 @@ public class TicTacToe {
 
     private static final int BOARD_SIZE = 3;
 
+    private static final char PLAYER_X = 'X';
+    private static final char PLAYER_O = 'O';
+    private static final char EMPTY_CELL = '_';
+
     private final char[][] gameBoard;
 
     public TicTacToe() {
@@ -14,7 +18,7 @@ public class TicTacToe {
 
         for (int rowIndex = 0; rowIndex < BOARD_SIZE; rowIndex++) {
             for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
-                gameBoard[rowIndex][columnIndex] = '_';
+                gameBoard[rowIndex][columnIndex] = EMPTY_CELL;
             }
         }
     }
@@ -27,7 +31,9 @@ public class TicTacToe {
         for (int index = 0; index < cellState.length(); index++) {
             char cellSymbol = cellState.charAt(index);
 
-            if (cellSymbol != 'X' && cellSymbol != 'O' && cellSymbol != '_') {
+            if (cellSymbol != PLAYER_X
+                    && cellSymbol != PLAYER_O
+                    && cellSymbol != EMPTY_CELL) {
                 return false;
             }
         }
@@ -59,6 +65,87 @@ public class TicTacToe {
         System.out.println("---------");
     }
 
+    private int countSymbols(char playerSymbol) {
+        int symbolCount = 0;
+
+        for (int rowIndex = 0; rowIndex < BOARD_SIZE; rowIndex++) {
+            for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
+                if (gameBoard[rowIndex][columnIndex] == playerSymbol) {
+                    symbolCount++;
+                }
+            }
+        }
+
+        return symbolCount;
+    }
+
+    private boolean hasWinningLine(char playerSymbol) {
+
+        // Check horizontal lines.
+        for (int rowIndex = 0; rowIndex < BOARD_SIZE; rowIndex++) {
+            if (gameBoard[rowIndex][0] == playerSymbol
+                    && gameBoard[rowIndex][1] == playerSymbol
+                    && gameBoard[rowIndex][2] == playerSymbol) {
+                return true;
+            }
+        }
+
+        // Check vertical lines.
+        for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
+            if (gameBoard[0][columnIndex] == playerSymbol
+                    && gameBoard[1][columnIndex] == playerSymbol
+                    && gameBoard[2][columnIndex] == playerSymbol) {
+                return true;
+            }
+        }
+
+        // Check the main diagonal.
+        if (gameBoard[0][0] == playerSymbol
+                && gameBoard[1][1] == playerSymbol
+                && gameBoard[2][2] == playerSymbol) {
+            return true;
+        }
+
+        // Check the secondary diagonal.
+        if (gameBoard[0][2] == playerSymbol
+                && gameBoard[1][1] == playerSymbol
+                && gameBoard[2][0] == playerSymbol) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isBoardFull() {
+        return countSymbols(EMPTY_CELL) == 0;
+    }
+
+    public String analyzeGameState() {
+        int xCount = countSymbols(PLAYER_X);
+        int oCount = countSymbols(PLAYER_O);
+
+        boolean xWins = hasWinningLine(PLAYER_X);
+        boolean oWins = hasWinningLine(PLAYER_O);
+
+        if (Math.abs(xCount - oCount) > 1 || (xWins && oWins)) {
+            return "Impossible";
+        }
+
+        if (xWins) {
+            return "X wins";
+        }
+
+        if (oWins) {
+            return "O wins";
+        }
+
+        if (isBoardFull()) {
+            return "Draw";
+        }
+
+        return "Game not finished";
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -81,6 +168,8 @@ public class TicTacToe {
         }
 
         game.displayBoard();
+
+        System.out.println(game.analyzeGameState());
 
         scanner.close();
     }
